@@ -1,8 +1,6 @@
 %{
 #include <stdio.h>
 
-extern int yylex(void);
-
 void yyerror(const char *str);
 %}
 
@@ -20,7 +18,7 @@ void yyerror(const char *str);
 %%
 
 program:
-|       vars calculations {printf("CORRECT\n");}
+|       vars LCBR calculations RCBR {printf("CORRECT\n");}
 ;
 
 vars:   VAR vars_list SEMICOLON
@@ -30,8 +28,8 @@ vars_list:  ident
 |           ident COMMA vars_list
 ;
 
-calculations:   operator
-|               operator calculations
+calculations:   operator SEMICOLON
+|               operator SEMICOLON calculations
 ;
 
 operator:   assign
@@ -88,7 +86,7 @@ const:  NUMBER
 %%
 
 void yyerror(const char *str) {
-	fprintf(stderr, "error: %s\n", str);
+	fprintf(stderr, "Error: %s", str);
 }
 
 int main() {

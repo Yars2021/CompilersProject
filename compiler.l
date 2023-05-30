@@ -7,33 +7,33 @@
 
 %%
 
-"var":  {return VAR;}
-"while": {return WHILE;}
-"do":   {return DO;}
+"var"  {return VAR;}
+"while" {return WHILE;}
+"do"   {return DO;}
 
-"=":    {return ASSIGN;}
+"="    {return ASSIGN;}
 
-"not":  {return NOT;}
+"not"  {return NOT;}
 
-"-":    {return MINUS;}
-"+":    {return PLUS;}
-"*":    {return MUL;}
-"/":    {return DIV;}
-"<":    {return LESS;}
-">":    {return MORE;}
-"==":   {return EQUALS;}
+"-"    {return MINUS;}
+"+"    {return PLUS;}
+"*"    {return MUL;}
+"/"    {return DIV;}
+"<"    {return LESS;}
+">"    {return MORE;}
+"=="   {return EQUALS;}
 
-"{":    {return LCBR;}
-"}":    {return RCBR;}
+"{"    {return LCBR;}
+"}"    {return RCBR;}
 
-"(":    {return LBR;}
-")":    {return RBR;}
+"("    {return LBR;}
+")"    {return RBR;}
 
-";":    {return SEMICOLON;}
-",":    {return COMMA;}
+";"    {return SEMICOLON;}
+","    {return COMMA;}
 
-[a-z]:  {return LETTER;}
-[0-9]:  {return NUMBER;}
+[a-z]  {return LETTER;}
+[0-9]  {return NUMBER;}
 
 [\n]                            /* ignore newlines */;
 [ \t]+                          /* ignore whitespace */;
