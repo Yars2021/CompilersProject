@@ -4,7 +4,7 @@
 void yyerror(const char *str);
 %}
 
-%token VAR WHILE DO
+%token VAR WHILE DO PRINT
 %token ASSIGN NOT
 %token MINUS PLUS MUL DIV LESS MORE EQUALS
 %token LCBR RCBR LBR RBR
@@ -34,6 +34,7 @@ calculations:   operator SEMICOLON
 
 operator:   assign
 |           complex_op
+|           PRINT LBR ident RBR
 ;
 
 assign:     ident ASSIGN expr

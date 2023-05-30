@@ -10,6 +10,7 @@
 "var"  {return VAR;}
 "while" {return WHILE;}
 "do"   {return DO;}
+"print" {return PRINT;}
 
 "="    {return ASSIGN;}
 
