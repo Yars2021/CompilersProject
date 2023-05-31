@@ -33,8 +33,8 @@
 ";"    {return SEMICOLON;}
 ","    {return COMMA;}
 
-[a-z]+  {return IDENT;}
-[0-9]+  {return NUMBER;}
+[a-z]+  {yylval.name = yytext; return IDENT;}
+[0-9]+  {yylval.number = atoi(yytext); return NUMBER;}
 
 [\n]                            /* ignore newlines */;
 [ \t]+                          /* ignore whitespace */;

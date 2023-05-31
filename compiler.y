@@ -16,25 +16,29 @@ void yyerror(const char *str);
 %left PLUS MINUS
 %left MUL DIV
 
-%type <node> calculations operator complex_op cycle_op expr sub_expr ident const
+%type <node> calculations operator assign complex_op comb_op cycle_op expr sub_expr operand
 %type <operation> binary_op unary_op
+%type <name> IDENT
+%type <number> NUMBER
 
 %union {
-    ast_node *node;
+    struct ast_node *node;
     int operation;
+    char *name;
+    int number;
 }
 
 %%
 
 program:
-|       vars LCBR calculations RCBR {print_ast(FILENAME, $3, 0);}
+|       vars LCBR calculations RCBR {print_ast($3, 0); delete_ast_node($3);}
 ;
 
 vars:   VAR vars_list SEMICOLON
 ;
 
-vars_list:  ident
-|           ident COMMA vars_list
+vars_list:  IDENT
+|           IDENT COMMA vars_list
 ;
 
 calculations:   operator SEMICOLON                  {$$ = create_ast_node_root(); add_child($$, $1);}
@@ -43,10 +47,10 @@ calculations:   operator SEMICOLON                  {$$ = create_ast_node_root()
 
 operator:   assign                      {$$ = $1; $$->branches[0]->var_val->value = eval($$->branches[1]);}
 |           complex_op                  {$$ = $1;}
-|           PRINT LBR ident RBR         {printf("%s = %d\n", $3->name, $3->value);}
+|           PRINT LBR IDENT RBR         {printf("%s = %d\n", $3, 0);}
 ;
 
-assign:     ident ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, $1); add_child($$, $3);}
+assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, create_ast_node_var(create_variable($1, 0))); add_child($$, $3);}
 ;
 
 expr:       unary_op sub_expr           {$$ = create_ast_node_op($1); add_child($$, $2);}
@@ -92,5 +96,7 @@ void yyerror(const char *str) {
 }
 
 int main() {
+    FILE *file = fopen(FILENAME, "w");
+    if (file) fclose(file);
 	return yyparse();
 }

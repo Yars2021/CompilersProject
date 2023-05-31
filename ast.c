@@ -1,7 +1,7 @@
 #include "ast.h"
 
 char *alloc_string(char *str) {
-    if (!string) return NULL;
+    if (!str) return NULL;
     char *string = (char*) malloc(sizeof(char) * strlen(str) + 1);
     memset(string, 0, strlen(str) + 1);
     memcpy(string, str, strlen(str) + 1);
@@ -10,7 +10,7 @@ char *alloc_string(char *str) {
 
 variable *create_variable(char *name, int value) {
     if (!name) return NULL;
-    variable *var = (variable*) malloc(sieof(variable));
+    variable *var = (variable*) malloc(sizeof(variable));
     var->name = alloc_string(name);
     var->value = value;
     return var;
@@ -42,6 +42,7 @@ ast_node *create_ast_node_var(variable *var) {
     ast_node *node = create_ast_node();
     node->node_type = 2;
     node->var_val = var;
+    return node;
 }
 
 ast_node *create_ast_node_op(int operation) {
@@ -68,8 +69,10 @@ void add_child(ast_node *node, ast_node *child) {
     node->branches = new_nodes;
 }
 
-void print_ast(FILE *file, ast_node *node, size_t tabs) {
+void print_ast(ast_node *node, size_t tabs) {
     if (!node) return;
+
+
 
     char *node_type;
     switch (node->node_type) {
@@ -86,6 +89,8 @@ void print_ast(FILE *file, ast_node *node, size_t tabs) {
             node_type = "operation_root";
             break;
     }
+
+    FILE *file = fopen(FILENAME, "r+");
 
     fprintf(file, "{\n\tnode_type: %s\n", node_type);
 
@@ -107,6 +112,8 @@ void print_ast(FILE *file, ast_node *node, size_t tabs) {
         print_ast(node->branches[i], tabs + 1);
 
     fprintf(file, "\t}\n}\n");
+
+    fclose(file);
 }
 
 void delete_ast_node(ast_node *node) {
@@ -158,7 +165,6 @@ int eval(ast_node *node) {
             return node->int_val;
         case 2:
             return node->var_val->value;
-        default:
-            return 0;
     }
+    return 0;
 }
