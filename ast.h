@@ -33,7 +33,7 @@ ast_node *create_ast_node_int(int int_value);
 ast_node *create_ast_node_var(variable *var);
 ast_node *create_ast_node_op(int operation);
 void add_child(ast_node *node, ast_node *child);
-void print_ast(ast_node *node);
+void print_ast(FILE *file, ast_node *node, size_t tabs);
 void delete_ast_node(ast_node *node);
 
 #endif //AST_H

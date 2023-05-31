@@ -16,6 +16,12 @@ void yyerror(const char *str);
 %left PLUS MINUS
 %left MUL DIV
 
+%type
+
+%union {
+
+}
+
 %%
 
 program:

@@ -62,8 +62,40 @@ void add_child(ast_node *node, ast_node *child) {
     node->branches = new_nodes;
 }
 
-void print_ast(ast_node *node) {
+void print_ast(FILE *file, ast_node *node, size_t tabs) {
+    if (!node) return;
 
+    char *node_type;
+    switch (node->node_type) {
+        case 0:
+            node_type = "operation";
+            break;
+        case 1:
+            node_type = "literal";
+            break;
+        case 2:
+            node_type = "variable";
+            break;
+    }
+
+    switch (node->node_type) {
+        case 0:
+            fprintf(file, "\toperation: %c\n", node->operation);
+            break;
+        case 1:
+            fprintf(file, "\tint_value: %d\n", node->int_val);
+            break;
+        case 2:
+            fprintf(file, "\tvariable:\n\t{\n\t\tvar_name: %s\n\t\tvar_value: %d\n\t}\n", node->var_val->name, node->var_val->value);
+            break;
+    }
+
+    fprintf(file, "\tnum_of_branches: %zd\n\tbranches:\n\t{\n", node->num_of_branches);
+
+    for (size_t i = 0; i < node->num_of_branches; i++)
+        print_ast(node->branches[i], tabs + 1);
+
+    fprintf(file, "\t}\n}\n");
 }
 
 void delete_ast_node(ast_node *node) {
