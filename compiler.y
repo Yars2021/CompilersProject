@@ -16,7 +16,7 @@ void yyerror(const char *str);
 %left PLUS MINUS
 %left MUL DIV
 
-%type <node> operator complex_op cycle_op expr sub_expr ident const
+%type <node> calculations operator complex_op cycle_op expr sub_expr ident const
 %type <operation> binary_op unary_op
 
 %union {
@@ -27,7 +27,7 @@ void yyerror(const char *str);
 %%
 
 program:
-|       vars LCBR calculations RCBR {printf("CORRECT\n");}
+|       vars LCBR calculations RCBR {print_ast(FILENAME, $3, 0);}
 ;
 
 vars:   VAR vars_list SEMICOLON
@@ -37,8 +37,8 @@ vars_list:  ident
 |           ident COMMA vars_list
 ;
 
-calculations:   operator SEMICOLON
-|               operator SEMICOLON calculations
+calculations:   operator SEMICOLON                  {$$ = create_ast_node_root(); add_child($$, $1);}
+|               calculations operator SEMICOLON     {$$ = $1; add_child($$, $2);}
 ;
 
 operator:   assign                      {$$ = $1; $$->branches[0]->var_val->value = eval($$->branches[1]);}
@@ -59,13 +59,13 @@ sub_expr:   LBR expr RBR                {$$ = $2;}
 ;
 
 complex_op: cycle_op                    {$$ = $1;}
-|           comb_op
+|           comb_op                     {$$ = $1;}
 ;
 
 cycle_op:   WHILE expr DO operator      {$$ = create_ast_node_op('C'); add_child($$, $2); add_child($$, $4);}
 ;
 
-comb_op:    LCBR calculations RCBR
+comb_op:    LCBR calculations RCBR      {$$ = $2;}
 ;
 
 unary_op:   MINUS   {$$ = '-';}

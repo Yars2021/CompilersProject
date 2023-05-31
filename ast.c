@@ -51,6 +51,12 @@ ast_node *create_ast_node_op(int operation) {
     return node;
 }
 
+ast_node *create_ast_node_root() {
+    ast_node *node = create_ast_node();
+    node->node_type = 4;
+    return node;
+}
+
 void add_child(ast_node *node, ast_node *child) {
     if (!node || !child) return;
     node->num_of_branches++;
@@ -76,7 +82,12 @@ void print_ast(FILE *file, ast_node *node, size_t tabs) {
         case 2:
             node_type = "variable";
             break;
+        case 4:
+            node_type = "operation_root";
+            break;
     }
+
+    fprintf(file, "{\n\tnode_type: %s\n", node_type);
 
     switch (node->node_type) {
         case 0:
@@ -147,5 +158,7 @@ int eval(ast_node *node) {
             return node->int_val;
         case 2:
             return node->var_val->value;
+        default:
+            return 0;
     }
 }

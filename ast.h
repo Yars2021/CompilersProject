@@ -19,7 +19,7 @@ typedef struct {
 typedef struct {
     size_t num_of_branches;
     ast_node **branches;
-    int node_type;  // 0 - op, 1 - int, 2 - var
+    int node_type;  // 0 - op, 1 - int, 2 - var, 4 - root
     union {
         int operation; // A - assign, N - not, E - equals
         int int_val;
@@ -32,6 +32,7 @@ void delete_variable(variable *var);
 ast_node *create_ast_node_int(int int_value);
 ast_node *create_ast_node_var(variable *var);
 ast_node *create_ast_node_op(int operation);
+ast_node *create_ast_node_root();
 void add_child(ast_node *node, ast_node *child);
 void print_ast(FILE *file, ast_node *node, size_t tabs);
 void delete_ast_node(ast_node *node);
