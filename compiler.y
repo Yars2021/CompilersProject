@@ -9,17 +9,19 @@ void yyerror(const char *str);
 %token ASSIGN NOT
 %token MINUS PLUS MUL DIV LESS MORE EQUALS
 %token LCBR RCBR LBR RBR
-%token LETTER NUMBER
+%token IDENT NUMBER
 %token SEMICOLON COMMA
 
 %left LESS MORE EQUALS
 %left PLUS MINUS
 %left MUL DIV
 
-%type
+%type <node> operator complex_op cycle_op expr sub_expr ident const
+%type <operation> binary_op unary_op
 
 %union {
-
+    ast_node *node;
+    int operation;
 }
 
 %%
@@ -39,56 +41,48 @@ calculations:   operator SEMICOLON
 |               operator SEMICOLON calculations
 ;
 
-operator:   assign
-|           complex_op
-|           PRINT LBR ident RBR
+operator:   assign                      {$$ = $1; $$->branches[0]->var_val->value = eval($$->branches[1]);}
+|           complex_op                  {$$ = $1;}
+|           PRINT LBR ident RBR         {printf("%s = %d\n", $3->name, $3->value);}
 ;
 
-assign:     ident ASSIGN expr
+assign:     ident ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, $1); add_child($$, $3);}
 ;
 
-expr:       unary_op sub_expr
-|           sub_expr
+expr:       unary_op sub_expr           {$$ = create_ast_node_op($1); add_child($$, $2);}
+|           sub_expr                    {$$ = $1;}
 ;
 
-sub_expr:   LBR expr RBR
-|           operand
-|           sub_expr binary_op sub_expr
+sub_expr:   LBR expr RBR                {$$ = $2;}
+|           operand                     {$$ = $1;}
+|           sub_expr binary_op sub_expr {$$ = create_ast_node_op($2); add_child($$, $1); add_child($$, $3);}
 ;
 
-unary_op:   MINUS
-|           NOT
-;
-
-binary_op:  MINUS
-|           PLUS
-|           MUL
-|           DIV
-|           LESS
-|           MORE
-|           EQUALS
-;
-
-operand:    ident
-|           const
-;
-
-complex_op: cycle_op
+complex_op: cycle_op                    {$$ = $1;}
 |           comb_op
 ;
 
-cycle_op:   WHILE expr DO operator
+cycle_op:   WHILE expr DO operator      {$$ = create_ast_node_op('C'); add_child($$, $2); add_child($$, $4);}
 ;
 
 comb_op:    LCBR calculations RCBR
 ;
 
-ident:  LETTER
-|       LETTER ident
+unary_op:   MINUS   {$$ = '-';}
+|           NOT     {$$ = 'N';}
 ;
 
-const:  NUMBER
-|       NUMBER const
+binary_op:  MINUS   {$$ = '-';}
+|           PLUS    {$$ = '+';}
+|           MUL     {$$ = '*';}
+|           DIV     {$$ = '/';}
+|           LESS    {$$ = '<';}
+|           MORE    {$$ = '>';}
+|           EQUALS  {$$ = 'E';}
+;
+
+operand:    IDENT    {$$ = create_ast_node_var(create_variable($1, 0));}
+|           NUMBER   {$$ = create_ast_node_int($1);}
 ;
 
 %%

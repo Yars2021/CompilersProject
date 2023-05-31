@@ -33,8 +33,8 @@
 ";"    {return SEMICOLON;}
 ","    {return COMMA;}
 
-[a-z]  {return LETTER;}
-[0-9]  {return NUMBER;}
+[a-z]+  {return IDENT;}
+[0-9]+  {return NUMBER;}
 
 [\n]                            /* ignore newlines */;
 [ \t]+                          /* ignore whitespace */;

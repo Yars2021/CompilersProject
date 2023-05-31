@@ -104,3 +104,48 @@ void delete_ast_node(ast_node *node) {
     for (size_t i = 0; i < node->num_of_branches; i++)
         delete_ast_node(node->branches[i]);
 }
+
+int eval(ast_node *node) {
+    if (!node) return 0;
+    switch (node->node_type) {
+        case 0:
+            switch (node->operation) {
+                case '+':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) + eval(node->branches[1]);
+                case '-':
+                    if (node->num_of_branches == 1)
+                        return -eval(node->branches[0]);
+                    else
+                        if (node->num_of_branches == 2)
+                            return eval(node->branches[0]) - eval(node->branches[1]);
+                    else return 0;
+                case '*':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) * eval(node->branches[1]);
+                case '/':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) / eval(node->branches[1]);
+                case 'N':
+                    if (node->num_of_branches != 1) return 0;
+                    else return !eval(node->branches[0]);
+                case '>':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) > eval(node->branches[1]);
+                case '<':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) < eval(node->branches[1]);
+                case 'E':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[0]) == eval(node->branches[1]);
+                case 'A':
+                    if (node->num_of_branches != 2) return 0;
+                    else return eval(node->branches[1]);
+            }
+            break;
+        case 1:
+            return node->int_val;
+        case 2:
+            return node->var_val->value;
+    }
+}
