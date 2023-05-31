@@ -1,0 +1,13 @@
+var a, b, c;
+{
+  a = 10;
+  b = 1;
+  c = 300;
+  while a > b
+  do {
+    a = a - b;
+    c = c + (-1); 
+  };
+  a = c + c * c;
+  b = -(a);
+}
