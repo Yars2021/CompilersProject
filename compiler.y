@@ -1,5 +1,6 @@
 %{
 #include <stdio.h>
+#include "ast.h"
 
 void yyerror(const char *str);
 %}
