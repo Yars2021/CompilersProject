@@ -5,37 +5,44 @@
 #ifndef AST_H
 #define AST_H
 
-#include <stdlib.h>
-#include <string.h>
-#include <stdio.h>
+#define FILENAME "/home/yars/work/labs/compilers/CompilersProject/ast.txt"
 
-#define FILENAME "/home/yars/labs/compilers_labs/compilers_project/ast.txt"
+#define NODE_TYPE_PROGRAM_ROOT (-1)
+#define NODE_TYPE_OP_ROOT 0
+#define NODE_TYPE_OPERATION 1
+#define NODE_TYPE_LITERAL 2
+#define NODE_TYPE_VARIABLE 3
+#define NODE_TYPE_VAR_DEF 4
 
-typedef struct {
+typedef struct variable {
     char *name;
     int value;
+    struct variable *next_var;
 } variable;
 
 typedef struct ast_node {
     size_t num_of_branches;
     struct ast_node **branches;
-    int node_type;  // 0 - op, 1 - int, 2 - var, 4 - root
+    int node_type;  // -1 - program_root, 0 - op_root, 1 - op, 2 - int, 3 - var, 4 - var_def
     union {
         int operation; // A - assign, N - not, E - equals
         int int_val;
-        variable *var_val;
+        char *var_name;
     };
 } ast_node;
 
 variable *create_variable(char *name, int value);
 void delete_variable(variable *var);
-ast_node *create_ast_node_int(int int_value);
-ast_node *create_ast_node_var(variable *var);
+void delete_variables(variable *var);
+ast_node *create_ast_node_lit(int int_value);
+ast_node *create_ast_node_var(char *name);
 ast_node *create_ast_node_op(int operation);
+ast_node *create_ast_node_var_def(char *name);
 ast_node *create_ast_node_root();
+ast_node *create_ast_node_program_root();
 void add_child(ast_node *node, ast_node *child);
-void print_ast(ast_node *node, size_t tabs);
+void print_ast(FILE *file, ast_node *node, size_t tabs);
 void delete_ast_node(ast_node *node);
-int eval(ast_node *node);
+int eval_literals(ast_node *node);
 
 #endif //AST_H

@@ -2,6 +2,7 @@
 
 %{
 #include <stdio.h>
+#include "ast.h"
 #include "compiler.tab.h"
 %}
 
@@ -33,7 +34,7 @@
 ";"    {return SEMICOLON;}
 ","    {return COMMA;}
 
-[a-z]+  {yylval.name = yytext; return IDENT;}
+[a-z]+  {sscanf(yytext,"%s", yylval.var_name); return IDENT;}
 [0-9]+  {yylval.number = atoi(yytext); return NUMBER;}
 
 [\n]                            /* ignore newlines */;

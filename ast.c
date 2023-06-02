@@ -1,3 +1,6 @@
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
 #include "ast.h"
 
 char *alloc_string(char *str) {
@@ -30,36 +33,50 @@ ast_node *create_ast_node() {
     return node;
 }
 
-ast_node *create_ast_node_int(int int_value) {
+ast_node *create_ast_node_lit(int int_value) {
     ast_node *node = create_ast_node();
-    node->node_type = 1;
+    node->node_type = NODE_TYPE_LITERAL;
     node->int_val = int_value;
     return node;
 }
 
-ast_node *create_ast_node_var(variable *var) {
+ast_node *create_ast_node_var(char *var) {
     if (!var) return NULL;
     ast_node *node = create_ast_node();
-    node->node_type = 2;
-    node->var_val = var;
+    node->node_type = NODE_TYPE_VARIABLE;
+    node->var_name = alloc_string(var);
     return node;
 }
 
 ast_node *create_ast_node_op(int operation) {
     ast_node *node = create_ast_node();
-    node->node_type = 0;
+    node->node_type = NODE_TYPE_OPERATION;
     node->operation = operation;
     return node;
 }
 
+ast_node *create_ast_node_var_def(char *var) {
+    if (!var) return NULL;
+    ast_node *node = create_ast_node();
+    node->node_type = NODE_TYPE_VAR_DEF;
+    node->var_name = alloc_string(var);
+    return node;
+}
+
+
 ast_node *create_ast_node_root() {
     ast_node *node = create_ast_node();
-    node->node_type = 4;
+    node->node_type = NODE_TYPE_OP_ROOT;
+    return node;
+}
+
+ast_node *create_ast_node_program_root() {
+    ast_node *node = create_ast_node();
+    node->node_type = NODE_TYPE_PROGRAM_ROOT;
     return node;
 }
 
 void add_child(ast_node *node, ast_node *child) {
-    if (!node || !child) return;
     node->num_of_branches++;
     ast_node **new_nodes = (ast_node**) malloc(sizeof(ast_node*) * node->num_of_branches);
     for (size_t i = 0; i < node->num_of_branches - 1; i++)
@@ -69,102 +86,102 @@ void add_child(ast_node *node, ast_node *child) {
     node->branches = new_nodes;
 }
 
-void print_ast(ast_node *node, size_t tabs) {
+void print_ast(FILE *file, ast_node *node, size_t tabs) {
     if (!node) return;
 
-
+    char *tabs_line = (char*) malloc(tabs + 1);
+    memset(tabs_line, '\t', tabs);
+    tabs_line[tabs] = 0;
 
     char *node_type;
     switch (node->node_type) {
-        case 0:
-            node_type = "operation";
+        case NODE_TYPE_PROGRAM_ROOT:
+            node_type = "program_root";
             break;
-        case 1:
-            node_type = "literal";
-            break;
-        case 2:
-            node_type = "variable";
-            break;
-        case 4:
+        case NODE_TYPE_OP_ROOT:
             node_type = "operation_root";
             break;
+        case NODE_TYPE_OPERATION:
+            node_type = "operation";
+            break;
+        case NODE_TYPE_LITERAL:
+            node_type = "literal";
+            break;
+        case NODE_TYPE_VARIABLE:
+            node_type = "variable";
+            break;
+        case NODE_TYPE_VAR_DEF:
+            node_type = "variable_def";
+            break;
     }
 
-    FILE *file = fopen(FILENAME, "r+");
-
-    fprintf(file, "{\n\tnode_type: %s\n", node_type);
+    fprintf(file, "%s{\n%s\tnode_type: %s,\n", tabs_line, tabs_line, node_type);
 
     switch (node->node_type) {
-        case 0:
-            fprintf(file, "\toperation: %c\n", node->operation);
+        case NODE_TYPE_OPERATION:
+            fprintf(file, "%s\toperation: %c,\n", tabs_line, node->operation);
             break;
-        case 1:
-            fprintf(file, "\tint_value: %d\n", node->int_val);
+        case NODE_TYPE_LITERAL:
+            fprintf(file, "%s\tint_value: %d,\n", tabs_line, node->int_val);
             break;
-        case 2:
-            fprintf(file, "\tvariable:\n\t{\n\t\tvar_name: %s\n\t\tvar_value: %d\n\t}\n", node->var_val->name, node->var_val->value);
+        case NODE_TYPE_VARIABLE:
+        case NODE_TYPE_VAR_DEF:
+            fprintf(file, "%s\tvariable_name: %s,\n", tabs_line, node->var_name);
             break;
     }
 
-    fprintf(file, "\tnum_of_branches: %zd\n\tbranches:\n\t{\n", node->num_of_branches);
+    fprintf(file, "%s\tnum_of_branches: %zd,\n%s\tbranches:\n%s\t[\n", tabs_line, node->num_of_branches, tabs_line, tabs_line);
 
     for (size_t i = 0; i < node->num_of_branches; i++)
-        print_ast(node->branches[i], tabs + 1);
+        print_ast(file, node->branches[i], tabs + 2);
 
-    fprintf(file, "\t}\n}\n");
+    fprintf(file, "%s\t]\n%s}\n", tabs_line, tabs_line);
 
-    fclose(file);
+    free(tabs_line);
 }
 
 void delete_ast_node(ast_node *node) {
     if (!node) return;
-    if (node->node_type == 2) delete_variable(node->var_val);
+    if (node->node_type == NODE_TYPE_VARIABLE || node->node_type == NODE_TYPE_VAR_DEF) free(node->var_name);
     for (size_t i = 0; i < node->num_of_branches; i++)
         delete_ast_node(node->branches[i]);
 }
 
-int eval(ast_node *node) {
-    if (!node) return 0;
-    switch (node->node_type) {
-        case 0:
-            switch (node->operation) {
-                case '+':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) + eval(node->branches[1]);
-                case '-':
-                    if (node->num_of_branches == 1)
-                        return -eval(node->branches[0]);
-                    else
-                        if (node->num_of_branches == 2)
-                            return eval(node->branches[0]) - eval(node->branches[1]);
-                    else return 0;
-                case '*':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) * eval(node->branches[1]);
-                case '/':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) / eval(node->branches[1]);
-                case 'N':
-                    if (node->num_of_branches != 1) return 0;
-                    else return !eval(node->branches[0]);
-                case '>':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) > eval(node->branches[1]);
-                case '<':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) < eval(node->branches[1]);
-                case 'E':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[0]) == eval(node->branches[1]);
-                case 'A':
-                    if (node->num_of_branches != 2) return 0;
-                    else return eval(node->branches[1]);
-            }
-            break;
-        case 1:
-            return node->int_val;
-        case 2:
-            return node->var_val->value;
+int eval_literals(ast_node *node) {
+    if (!node || (node->node_type != NODE_TYPE_OPERATION) || (node->node_type != NODE_TYPE_LITERAL)) return 0;
+    if (node->node_type == NODE_TYPE_LITERAL) return node->int_val;
+    switch (node->operation) {
+        case '+':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) + eval_literals(node->branches[1]);
+        case '-':
+            if (node->num_of_branches == 1)
+                return -eval_literals(node->branches[0]);
+            else
+                if (node->num_of_branches == 2)
+                    return eval_literals(node->branches[0]) - eval_literals(node->branches[1]);
+            else return 0;
+        case '*':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) * eval_literals(node->branches[1]);
+        case '/':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) / eval_literals(node->branches[1]);
+        case 'N':
+            if (node->num_of_branches != 1) return 0;
+            else return !eval_literals(node->branches[0]);
+        case '>':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) > eval_literals(node->branches[1]);
+        case '<':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) < eval_literals(node->branches[1]);
+        case 'E':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[0]) == eval_literals(node->branches[1]);
+        case 'A':
+            if (node->num_of_branches != 2) return 0;
+            else return eval_literals(node->branches[1]);
     }
     return 0;
 }
