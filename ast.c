@@ -59,7 +59,7 @@ ast_node *create_ast_node_var_def(char *var) {
     if (!var) return NULL;
     ast_node *node = create_ast_node();
     node->node_type = NODE_TYPE_VAR_DEF;
-    node->var_name = alloc_string(var);
+    node->var = create_variable(var, 0);
     return node;
 }
 
@@ -125,8 +125,10 @@ void print_ast(FILE *file, ast_node *node, size_t tabs) {
             fprintf(file, "%s\tint_value: %d,\n", tabs_line, node->int_val);
             break;
         case NODE_TYPE_VARIABLE:
-        case NODE_TYPE_VAR_DEF:
             fprintf(file, "%s\tvariable_name: %s,\n", tabs_line, node->var_name);
+            break;
+        case NODE_TYPE_VAR_DEF:
+            fprintf(file, "%s\tvariable_name: %s,\n%s\tvariable_value: %d,\n", tabs_line, node->var->name, tabs_line, node->var->value);
             break;
     }
 
@@ -142,7 +144,8 @@ void print_ast(FILE *file, ast_node *node, size_t tabs) {
 
 void delete_ast_node(ast_node *node) {
     if (!node) return;
-    if (node->node_type == NODE_TYPE_VARIABLE || node->node_type == NODE_TYPE_VAR_DEF) free(node->var_name);
+    if (node->node_type == NODE_TYPE_VARIABLE) free(node->var_name);
+    if (node->node_type == NODE_TYPE_VAR_DEF) delete_variable(node->var);
     for (size_t i = 0; i < node->num_of_branches; i++)
         delete_ast_node(node->branches[i]);
 }

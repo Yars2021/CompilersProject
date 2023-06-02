@@ -17,7 +17,6 @@
 typedef struct variable {
     char *name;
     int value;
-    struct variable *next_var;
 } variable;
 
 typedef struct ast_node {
@@ -28,12 +27,12 @@ typedef struct ast_node {
         int operation; // A - assign, N - not, E - equals
         int int_val;
         char *var_name;
+        variable *var;
     };
 } ast_node;
 
 variable *create_variable(char *name, int value);
 void delete_variable(variable *var);
-void delete_variables(variable *var);
 ast_node *create_ast_node_lit(int int_value);
 ast_node *create_ast_node_var(char *name);
 ast_node *create_ast_node_op(int operation);
