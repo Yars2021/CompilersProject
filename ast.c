@@ -40,11 +40,11 @@ ast_node *create_ast_node_lit(int int_value) {
     return node;
 }
 
-ast_node *create_ast_node_var(char *var) {
-    if (!var) return NULL;
+ast_node *create_ast_node_var(char *name) {
+    if (!name) return NULL;
     ast_node *node = create_ast_node();
     node->node_type = NODE_TYPE_VARIABLE;
-    node->var_name = alloc_string(var);
+    node->var_name = alloc_string(name);
     return node;
 }
 
@@ -55,14 +55,13 @@ ast_node *create_ast_node_op(int operation) {
     return node;
 }
 
-ast_node *create_ast_node_var_def(char *var) {
-    if (!var) return NULL;
+ast_node *create_ast_node_var_def(char *name) {
+    if (!name) return NULL;
     ast_node *node = create_ast_node();
     node->node_type = NODE_TYPE_VAR_DEF;
-    node->var = create_variable(var, 0);
+    node->var = create_variable(name, 0);
     return node;
 }
-
 
 ast_node *create_ast_node_root() {
     ast_node *node = create_ast_node();

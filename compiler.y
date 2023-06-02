@@ -62,7 +62,7 @@ calculations:                                       {$$ = create_ast_node_root()
 
 operator:   assign                      {$$ = $1;}
 |           complex_op                  {$$ = $1;}
-|           PRINT LBR IDENT RBR         {printf("%s = %d\n", $3, 0);}
+|           PRINT LBR IDENT RBR         {$$ = create_ast_node_op('O'); add_child($$, create_ast_node_var($3));}
 ;
 
 assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, create_ast_node_var($1)); add_child($$, $3);}

@@ -22,9 +22,9 @@ typedef struct variable {
 typedef struct ast_node {
     size_t num_of_branches;
     struct ast_node **branches;
-    int node_type;  // -1 - program_root, 0 - op_root, 1 - op, 2 - int, 3 - var, 4 - var_def
+    int node_type;
     union {
-        int operation; // A - assign, N - not, E - equals
+        int operation; // A - assign, N - not, E - equals, O - output
         int int_val;
         char *var_name;
         variable *var;
