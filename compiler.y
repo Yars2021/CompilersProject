@@ -68,13 +68,13 @@ operator:   assign                      {$$ = $1;}
 assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, create_ast_node_var($1)); add_child($$, $3);}
 ;
 
-expr:       unary_op sub_expr           {$$ = create_ast_node_op($1); add_child($$, $2);}
-|           sub_expr                    {$$ = $1;}
+expr:       sub_expr                    {$$ = $1;}
+|           unary_op sub_expr           {$$ = create_ast_node_op($1); add_child($$, $2); try_eval($$);}
 ;
 
 sub_expr:   LBR expr RBR                {$$ = $2;}
 |           operand                     {$$ = $1;}
-|           sub_expr binary_op sub_expr {$$ = create_ast_node_op($2); add_child($$, $1); add_child($$, $3);}
+|           sub_expr binary_op sub_expr {$$ = create_ast_node_op($2); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
 ;
 
 complex_op: cycle_op                    {$$ = $1;}

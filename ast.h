@@ -43,5 +43,6 @@ void add_child(ast_node *node, ast_node *child);
 void print_ast(FILE *file, ast_node *node, size_t tabs);
 void delete_ast_node(ast_node *node);
 int eval_literals(ast_node *node);
+void try_eval(ast_node *node);
 
 #endif //AST_H

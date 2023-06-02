@@ -147,11 +147,15 @@ void delete_ast_node(ast_node *node) {
     if (node->node_type == NODE_TYPE_VAR_DEF) delete_variable(node->var);
     for (size_t i = 0; i < node->num_of_branches; i++)
         delete_ast_node(node->branches[i]);
+    node->num_of_branches = 0;
+    free(node->branches);
+    free(node);
 }
 
 int eval_literals(ast_node *node) {
-    if (!node || (node->node_type != NODE_TYPE_OPERATION) || (node->node_type != NODE_TYPE_LITERAL)) return 0;
+    if (!node) return 0;
     if (node->node_type == NODE_TYPE_LITERAL) return node->int_val;
+    if (node->node_type != NODE_TYPE_OPERATION) return 0;
     switch (node->operation) {
         case '+':
             if (node->num_of_branches != 2) return 0;
@@ -186,4 +190,18 @@ int eval_literals(ast_node *node) {
             else return eval_literals(node->branches[1]);
     }
     return 0;
+}
+
+void try_eval(ast_node *node) {
+    if (!node) return;
+    if (node->node_type == NODE_TYPE_OPERATION) {
+        for (size_t i = 0; i < node->num_of_branches; i++)
+            if (node->branches[i]->node_type != NODE_TYPE_LITERAL) return;
+        int eval_res = eval_literals(node);
+        for (size_t i = 0; i < node->num_of_branches; i++)
+            delete_ast_node(node->branches[i]);
+        node->node_type = NODE_TYPE_LITERAL;
+        node->num_of_branches = 0;
+        node->int_val = eval_res;
+    }
 }
