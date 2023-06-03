@@ -21,13 +21,11 @@ void yyerror(const char *path, const char *str);
 %left MUL DIV
 
 %type <node> program vars vars_list calculations operator assign complex_op comb_op cycle_op expr sub_expr operand
-%type <operation> binary_op unary_op
 %type <var_name> IDENT
 %type <number> NUMBER
 
 %union {
     ast_node *node;
-    int operation;
     char var_name[256];
     int number;
 }
@@ -69,12 +67,19 @@ assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); add_child
 ;
 
 expr:       sub_expr                    {$$ = $1;}
-|           unary_op sub_expr           {$$ = create_ast_node_op($1); add_child($$, $2); try_eval($$);}
+|           MINUS sub_expr              {$$ = create_ast_node_op('-'); add_child($$, $2); try_eval($$);}
+|           NOT sub_expr                {$$ = create_ast_node_op('N'); add_child($$, $2); try_eval($$);}
 ;
 
-sub_expr:   LBR expr RBR                {$$ = $2;}
-|           operand                     {$$ = $1;}
-|           sub_expr binary_op sub_expr {$$ = create_ast_node_op($2); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+sub_expr:   operand                     {$$ = $1;}
+|           LBR expr RBR                {$$ = $2;}
+|           sub_expr MUL sub_expr       {$$ = create_ast_node_op('*'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr DIV sub_expr       {$$ = create_ast_node_op('/'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr PLUS sub_expr      {$$ = create_ast_node_op('+'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr MINUS sub_expr     {$$ = create_ast_node_op('-'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr LESS sub_expr      {$$ = create_ast_node_op('<'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr MORE sub_expr      {$$ = create_ast_node_op('>'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           sub_expr EQUALS sub_expr    {$$ = create_ast_node_op('E'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
 ;
 
 complex_op: cycle_op                    {$$ = $1;}
@@ -85,19 +90,6 @@ cycle_op:   WHILE expr DO operator      {$$ = create_ast_node_op('C'); add_child
 ;
 
 comb_op:    LCBR calculations RCBR      {$$ = $2;}
-;
-
-unary_op:   MINUS   {$$ = '-';}
-|           NOT     {$$ = 'N';}
-;
-
-binary_op:  MINUS   {$$ = '-';}
-|           PLUS    {$$ = '+';}
-|           MUL     {$$ = '*';}
-|           DIV     {$$ = '/';}
-|           LESS    {$$ = '<';}
-|           MORE    {$$ = '>';}
-|           EQUALS  {$$ = 'E';}
 ;
 
 operand:    IDENT    {$$ = create_ast_node_var($1);}

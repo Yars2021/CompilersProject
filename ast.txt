@@ -33,18 +33,10 @@
 						}
 						{
 							node_type: operation,
-							operation: +,
+							operation: *,
 							num_of_branches: 2,
 							branches:
 							[
-								{
-									node_type: variable,
-									variable_name: b,
-									num_of_branches: 0,
-									branches:
-									[
-									]
-								}
 								{
 									node_type: operation,
 									operation: +,
@@ -53,36 +45,28 @@
 									[
 										{
 											node_type: literal,
-											int_value: 10,
+											int_value: 5,
 											num_of_branches: 0,
 											branches:
 											[
 											]
 										}
 										{
-											node_type: operation,
-											operation: +,
-											num_of_branches: 2,
+											node_type: literal,
+											int_value: 5,
+											num_of_branches: 0,
 											branches:
 											[
-												{
-													node_type: literal,
-													int_value: 5,
-													num_of_branches: 0,
-													branches:
-													[
-													]
-												}
-												{
-													node_type: literal,
-													int_value: 1,
-													num_of_branches: 0,
-													branches:
-													[
-													]
-												}
 											]
 										}
+									]
+								}
+								{
+									node_type: literal,
+									int_value: 10,
+									num_of_branches: 0,
+									branches:
+									[
 									]
 								}
 							]

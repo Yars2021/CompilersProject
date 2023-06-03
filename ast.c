@@ -194,14 +194,14 @@ int eval_literals(ast_node *node) {
 
 void try_eval(ast_node *node) {
     if (!node) return;
-    if (node->node_type == NODE_TYPE_OPERATION) {
-        for (size_t i = 0; i < node->num_of_branches; i++)
-            if (node->branches[i]->node_type != NODE_TYPE_LITERAL) return;
-        int eval_res = eval_literals(node);
-        for (size_t i = 0; i < node->num_of_branches; i++)
-            delete_ast_node(node->branches[i]);
-        node->node_type = NODE_TYPE_LITERAL;
-        node->num_of_branches = 0;
-        node->int_val = eval_res;
-    }
+//    if (node->node_type == NODE_TYPE_OPERATION) {
+//        for (size_t i = 0; i < node->num_of_branches; i++)
+//            if (node->branches[i]->node_type != NODE_TYPE_LITERAL) return;
+//        int eval_res = eval_literals(node);
+//        for (size_t i = 0; i < node->num_of_branches; i++)
+//            delete_ast_node(node->branches[i]);
+//        node->node_type = NODE_TYPE_LITERAL;
+//        node->num_of_branches = 0;
+//        node->int_val = eval_res;
+//    }
 }
