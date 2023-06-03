@@ -20,7 +20,7 @@ void yyerror(const char *path, const char *str);
 %left PLUS MINUS
 %left MUL DIV
 
-%type <node> program vars vars_list calculations operator assign complex_op comb_op cycle_op expr sub_expr operand
+%type <node> program vars vars_list calculations operator assign complex_op comb_op cycle_op expr operand
 %type <var_name> IDENT
 %type <number> NUMBER
 
@@ -66,20 +66,17 @@ operator:   assign                      {$$ = $1;}
 assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); try_eval($3); add_child($$, create_ast_node_var($1)); add_child($$, $3);}
 ;
 
-expr:       sub_expr                    {$$ = $1;}
-|           MINUS sub_expr              {$$ = create_ast_node_op('-'); add_child($$, $2);}
-|           NOT sub_expr                {$$ = create_ast_node_op('N'); add_child($$, $2);}
-;
-
-sub_expr:   operand                     {$$ = $1;}
-|           LBR expr RBR                {$$ = $2;}
-|           sub_expr MUL sub_expr       {$$ = create_ast_node_op('*'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr DIV sub_expr       {$$ = create_ast_node_op('/'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr PLUS sub_expr      {$$ = create_ast_node_op('+'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr MINUS sub_expr     {$$ = create_ast_node_op('-'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr LESS sub_expr      {$$ = create_ast_node_op('<'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr MORE sub_expr      {$$ = create_ast_node_op('>'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
-|           sub_expr EQUALS sub_expr    {$$ = create_ast_node_op('E'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+expr:       operand             {$$ = $1;}
+|           LBR expr RBR        {$$ = $2;}
+|           MINUS expr          {$$ = create_ast_node_op('-'); add_child($$, $2); try_eval($2);}
+|           NOT expr            {$$ = create_ast_node_op('N'); add_child($$, $2); try_eval($2);}
+|           expr MUL expr       {$$ = create_ast_node_op('*'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr DIV expr       {$$ = create_ast_node_op('/'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr PLUS expr      {$$ = create_ast_node_op('+'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr MINUS expr     {$$ = create_ast_node_op('-'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr LESS expr      {$$ = create_ast_node_op('<'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr MORE expr      {$$ = create_ast_node_op('>'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
+|           expr EQUALS expr    {$$ = create_ast_node_op('E'); add_child($$, $1); add_child($$, $3); try_eval($1); try_eval($3);}
 ;
 
 complex_op: cycle_op                    {$$ = $1;}
