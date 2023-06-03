@@ -63,12 +63,12 @@ operator:   assign                      {$$ = $1;}
 |           PRINT LBR IDENT RBR         {$$ = create_ast_node_op('O'); add_child($$, create_ast_node_var($3));}
 ;
 
-assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); add_child($$, create_ast_node_var($1)); add_child($$, $3);}
+assign:     IDENT ASSIGN expr           {$$ = create_ast_node_op('A'); try_eval($3); add_child($$, create_ast_node_var($1)); add_child($$, $3);}
 ;
 
 expr:       sub_expr                    {$$ = $1;}
-|           MINUS sub_expr              {$$ = create_ast_node_op('-'); add_child($$, $2); try_eval($$);}
-|           NOT sub_expr                {$$ = create_ast_node_op('N'); add_child($$, $2); try_eval($$);}
+|           MINUS sub_expr              {$$ = create_ast_node_op('-'); add_child($$, $2);}
+|           NOT sub_expr                {$$ = create_ast_node_op('N'); add_child($$, $2);}
 ;
 
 sub_expr:   operand                     {$$ = $1;}
