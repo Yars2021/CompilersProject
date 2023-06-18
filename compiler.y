@@ -44,7 +44,7 @@ program:                            {;}
                                         add_child($$, $1);
                                         add_child($$, $3);
                                         print_ast(ast_file, $$, 0);
-                                        linearize($$);
+                                        linearize(linear_path, $$);
                                         delete_ast_node($$);
 
                                         if (ast_file) fclose(ast_file);
@@ -104,6 +104,17 @@ void yyerror(const char *ast_path, const char *linear_path, const char *str) {
 	fprintf(stderr, "Error: %s", str);
 }
 
-int main() {
-	return yyparse(FILENAME, LINEAR);
+int main(int argc, char **argv) {
+    if (argc < 2)
+        return yyparse(DEFAULT_AST_PATH, DEFAULT_LINEAR_PATH);
+    else
+        if (argc == 2)
+            return yyparse(DEFAULT_AST_PATH, argv[1]);
+        else
+            if (argc == 3)
+                return yyparse(argv[2], argv[1]);
+            else {
+                printf("Invalid arguments.\nFormat: compiler < <source> <destination> [ast]\n");
+                return -1;
+            }
 }

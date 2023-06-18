@@ -7,8 +7,7 @@
 
 #include <stdio.h>
 
-#define FILENAME "/home/yars/work/labs/compilers/CompilersProject/ast.txt"
-#define LINEAR "/home/yars/work/labs/compilers/CompilersProject/lin.txt"
+#define DEFAULT_AST_PATH "/home/yars/work/labs/compilers/CompilersProject/ast.txt"
 
 #define NODE_TYPE_PROGRAM_ROOT (-1)
 #define NODE_TYPE_OP_ROOT 0
