@@ -37,21 +37,16 @@ void yyerror(const char *ast_path, const char *linear_path, const char *str);
 program:                            {;}
 |       vars LCBR calculations RCBR {
                                         FILE *ast_file = fopen(ast_path, "w");
-                                        FILE *linear_file = fopen(linear_path, "w");
+
+                                        size_t cycle_label = 0;
 
                                         $$ = create_ast_node_program_root();
                                         add_child($$, $1);
                                         add_child($$, $3);
                                         print_ast(ast_file, $$, 0);
-
-                                        ast_node *linear = create_ast_node_program_root();
-                                        linearize_op($$, linear);
-                                        print_ast(linear_file, linear, 0);
-
+                                        linearize($$);
                                         delete_ast_node($$);
-                                        delete_ast_node(linear);
 
-                                        if (linear_file) fclose(linear_file);
                                         if (ast_file) fclose(ast_file);
                                     }
 ;
