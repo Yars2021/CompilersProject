@@ -416,9 +416,10 @@ typedef struct code_line {
 } code_line;
 
 void linearize(const char *path, ast_node *node) {
+    if (!node || node->node_type != NODE_TYPE_PROGRAM_ROOT || node->num_of_branches != 2) return;
+
     FILE *file = fopen(path, "w");
 
-    if (!node || node->node_type != NODE_TYPE_PROGRAM_ROOT || node->num_of_branches != 2) return;
     size_t var_num = count_var_defs(node), buf_num = var_num, label_num = 0, print_num = 0;
     linearize_op_root(file, node->branches[1], node, &buf_num, &label_num, &print_num);
     fprintf(file, "addi x0, x0, 0\n");
