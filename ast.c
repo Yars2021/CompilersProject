@@ -1,6 +1,5 @@
 #include <stdlib.h>
 #include <string.h>
-#include <stdio.h>
 #include "ast.h"
 
 char *alloc_string(char *str) {

@@ -5,7 +5,10 @@
 #ifndef AST_H
 #define AST_H
 
+#include <stdio.h>
+
 #define FILENAME "/home/yars/work/labs/compilers/CompilersProject/ast.txt"
+#define LINEAR "/home/yars/work/labs/compilers/CompilersProject/lin.txt"
 
 #define NODE_TYPE_PROGRAM_ROOT (-1)
 #define NODE_TYPE_OP_ROOT 0
@@ -31,6 +34,7 @@ typedef struct ast_node {
     };
 } ast_node;
 
+char *alloc_string(char *str);
 variable *create_variable(char *name, int value);
 void delete_variable(variable *var);
 ast_node *create_ast_node_lit(int int_value);

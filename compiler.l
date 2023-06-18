@@ -4,6 +4,8 @@
 #include <stdio.h>
 #include "ast.h"
 #include "compiler.tab.h"
+
+void yyerror(const char *str);
 %}
 
 %%
