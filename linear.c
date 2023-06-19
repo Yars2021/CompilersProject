@@ -346,12 +346,13 @@ void linearize_op(FILE *linear, ast_node *node, ast_node *prg_root, size_t *buf_
 
 void linearize_cycle(FILE *linear, ast_node *node, ast_node *prg_root, size_t *buf_num, size_t *label_num, size_t *print_num) {
     if (!node || node->node_type != NODE_TYPE_OPERATION || node->operation != 'C') return;
-    fprintf(linear,"CYCLE_START%zd:\n", *label_num);
-    linearize_op(linear, node->branches[0], prg_root, buf_num);
-    fprintf(linear, "lw x1, x0, %zd\nbne x1, x0, 1\njal x0, CYCLE_EXIT%zd\n", (*buf_num) - 1, *label_num);
-    linearize_op_root(linear, node->branches[1], prg_root, buf_num, label_num, print_num);
-    fprintf(linear, "jal x0, CYCLE_START%zd\nCYCLE_EXIT%zd:\n", *label_num, *label_num);
+    size_t current_label = *label_num;
     (*label_num)++;
+    fprintf(linear,"CYCLE_START%zd:\n", current_label);
+    linearize_op(linear, node->branches[0], prg_root, buf_num);
+    fprintf(linear, "lw x1, x0, %zd\nbne x1, x0, 1\njal x0, CYCLE_EXIT%zd\n", (*buf_num) - 1, current_label);
+    linearize_op_root(linear, node->branches[1], prg_root, buf_num, label_num, print_num);
+    fprintf(linear, "jal x0, CYCLE_START%zd\nCYCLE_EXIT%zd:\n", current_label, current_label);
 }
 
 void linearize_op_root(FILE *linear, ast_node *node, ast_node *prg_root, size_t *buf_num, size_t *label_num, size_t *print_num) {
