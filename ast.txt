@@ -48,7 +48,7 @@
 								}
 								{
 									node_type: literal,
-									int_value: 15,
+									int_value: 5,
 									num_of_branches: 0,
 									branches:
 									[
@@ -68,27 +68,11 @@
 									branches:
 									[
 										{
-											node_type: operation,
-											operation: *,
-											num_of_branches: 2,
+											node_type: literal,
+											int_value: 0,
+											num_of_branches: 0,
 											branches:
 											[
-												{
-													node_type: variable,
-													variable_name: a,
-													num_of_branches: 0,
-													branches:
-													[
-													]
-												}
-												{
-													node_type: variable,
-													variable_name: a,
-													num_of_branches: 0,
-													branches:
-													[
-													]
-												}
 											]
 										}
 										{
@@ -103,16 +87,95 @@
 								}
 								{
 									node_type: operation,
-									operation: O,
-									num_of_branches: 1,
+									operation: C,
+									num_of_branches: 2,
 									branches:
 									[
 										{
-											node_type: variable,
-											variable_name: b,
-											num_of_branches: 0,
+											node_type: operation,
+											operation: <,
+											num_of_branches: 2,
 											branches:
 											[
+												{
+													node_type: variable,
+													variable_name: b,
+													num_of_branches: 0,
+													branches:
+													[
+													]
+												}
+												{
+													node_type: literal,
+													int_value: 5,
+													num_of_branches: 0,
+													branches:
+													[
+													]
+												}
+											]
+										}
+										{
+											node_type: operation_root,
+											num_of_branches: 2,
+											branches:
+											[
+												{
+													node_type: operation,
+													operation: O,
+													num_of_branches: 1,
+													branches:
+													[
+														{
+															node_type: variable,
+															variable_name: b,
+															num_of_branches: 0,
+															branches:
+															[
+															]
+														}
+													]
+												}
+												{
+													node_type: operation,
+													operation: A,
+													num_of_branches: 2,
+													branches:
+													[
+														{
+															node_type: operation,
+															operation: +,
+															num_of_branches: 2,
+															branches:
+															[
+																{
+																	node_type: variable,
+																	variable_name: b,
+																	num_of_branches: 0,
+																	branches:
+																	[
+																	]
+																}
+																{
+																	node_type: literal,
+																	int_value: 1,
+																	num_of_branches: 0,
+																	branches:
+																	[
+																	]
+																}
+															]
+														}
+														{
+															node_type: variable,
+															variable_name: b,
+															num_of_branches: 0,
+															branches:
+															[
+															]
+														}
+													]
+												}
 											]
 										}
 									]
